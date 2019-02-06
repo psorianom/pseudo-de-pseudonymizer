@@ -1,12 +1,31 @@
 # pseudo-de-pseudonymizer
 Code to transform an already pseudonymized text into pseudo (false) non-anonymized data.
-For example, the already pseudonymized text: 
+For example, the already pseudonymized text (with `...` tags replacing personal data): 
     
-    diminution du volume horaire du contrat de travail afin de permettre à chacun de préserver son emploi, le contrat de travail de Mme X... nèe le ... demeurant ..., passant à temps partiel sur une base de 20 heures par semaine par tranches quotidiennes de 4 heures. 
+    le contrat de travail de Mme X... nèe le ... demeurant ..., passant à temps partiel
+    sur une base de 20 heures 
+    
+Is first converted to:
 
-Is converted to:
+    le contrat de travail de Mme PERPERPER née le DATEDATEDATE demeurant LOCLOCLOC , passant à temps partiel
+    sur une base de 20 heures 
+    
+And finally, converted to the CoNLL format:
 
-    diminution du volume horaire du contrat de travail afin de permettre à chacun de préserver son emploi, le contrat de travail de Mme DUPONT nèe le 01 janvier 1940 demeurant 99 rue raoul servant Vaulx-en-Velin 78665 , passant à temps partiel sur une base de 20 heures par semaine par tranches quotidiennes de 4 heures. 
+| | | | | | |
+|-|-|-|-|-|-|
+|  le      | O      | 1940      | I-DATE | 78665   | I-LOC |
+| contrat  | O      | demeurant | O      | ,       | O     |
+| de       | O      | 99        | B-LOC  | passant | O     |
+|  travail | O      | rue       | I-LOC  | à       | O     |
+| de       | O      | raoul     | I-LOC  | temps   | O     |
+| Mme      | O      | servant   | I-LOC  | partiel | O     |
+| DUPONT   | B-PER  | Vaulx     | I-LOC  | sur     | O     |
+| nèe      | O      | -         | I-LOC  | une     | O     |
+| le       | O      | en        | I-LOC  | base    | O     |
+| 01       | B-DATE | -         | I-LOC  | de      | O     |
+| janvier  | I-DATE | Velin     | I-LOC  | 20      | O     |
+|          |        |           |        | heures  | O     |
 
 
 

@@ -1,5 +1,14 @@
 # pseudo-de-pseudonymizer
 Code to transform an already pseudonymized text into pseudo (false) non-anonymized data.
+For example, the already pseudonymized text: 
+    
+    diminution du volume horaire du contrat de travail afin de permettre à chacun de préserver son emploi, le contrat de travail de Mme X... nèe le ... demeurant ..., passant à temps partiel sur une base de 20 heures par semaine par tranches quotidiennes de 4 heures. 
+
+Is converted to:
+
+    diminution du volume horaire du contrat de travail afin de permettre à chacun de préserver son emploi, le contrat de travail de Mme DUPONT nèe le 01 janvier 1940 demeurant 99 rue raoul servant Vaulx-en-Velin 78665 , passant à temps partiel sur une base de 20 heures par semaine par tranches quotidiennes de 4 heures. 
+
+
 
 ## Introduction
 

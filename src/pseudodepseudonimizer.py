@@ -5,9 +5,9 @@ Usage:
     txt2conll.py <s> <i> <o>
 
 Arguments:
-    <-s>                   The string to replace by its numbered version
-    <-i>                   An input file or directory (if dir it will convert all txt files inside).
-    <-o>                   An output directory.
+    <s>                   The string to replace by its numbered version
+    <i>                   An input file or directory (if dir it will convert all txt files inside).
+    <o>                   An output directory.
 '''
 import re
 from argopt import argopt

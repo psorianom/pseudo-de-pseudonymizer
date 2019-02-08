@@ -7,7 +7,7 @@ Usage:
 
 Arguments:
     -n PCT --num_seq=PCT    Number of sequences to keep in new dataset [default: 10000]
-    -g TAGS --tags=TAGS     String representing the tags in the input dataset [default: PER,LOC,DATE]
+    -g TAGS --tags=TAGS     String representing the tags in the input dataset [default: PER,LOC,DATE,O]
     -s --stratified         Try to keep the same
 '''
 
@@ -15,6 +15,10 @@ Arguments:
 from docopt import docopt
 from collections import defaultdict
 import os
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='1.0')
@@ -24,24 +28,23 @@ if __name__ == '__main__':
     desired_n_sequences = int(arguments["--num_seq"])
     tags_used = arguments["--tags"].split(",")
     tags_freqs = {}
-    tags_proportions = {}
+    sample_proportions = {}
     tags_occurrences = defaultdict(int)
     for tag in tags_used:
-        cmd = "grep  -PRn  'B-{}' {} | wc -l".format(tag, conll_path)
+
+        logger.info("Getting the number of {} sequences on source file".format(tag))
+        if tag == "O":
+            cmd = "grep  -PRn  '\sO' {} | wc -l".format(conll_path)
+        else:
+            cmd = "grep  -PRn  'B-{}' {} | wc -l".format(tag, conll_path)
         output = int(os.popen(cmd).read().strip())
         tags_freqs[tag] = output
 
-    n_all_sequences = sum(tags_occurrences.values())
-    for tag in tags_used:
-        tags_proportions[tag] = tags_freqs[tag] / n_all_sequences
-
-    stratified = False
-
-
     if "--stratified" in arguments:
         stratified = True
-        tags_proportions = dict(zip(tags_used, [desired_n_sequences/len for _ in range(len(tags_used))]))
-        breakpoint()
+        n_all_sequences = sum(tags_freqs.values())
+        for tag in tags_used:
+            sample_proportions[tag] = (desired_n_sequences * tags_freqs[tag])/n_all_sequences
 
     actual_n_sequences = 0
     output_file = open(new_dataset_file, "w")

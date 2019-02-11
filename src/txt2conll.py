@@ -34,7 +34,7 @@ MONTHS = ["janvier", "février", "mars", "avril", "mai", "june", "juillet",
 NAMES_TOKENIZER = re.compile(r"[\-\s]")
 
 def _load_names():
-    df_names = pd.read_csv("../../resources/names/names_last_names_FR.csv")
+    df_names = pd.read_csv("../resources/names/names_last_names_FR.csv")
     return df_names.prenom.dropna().values
 
 

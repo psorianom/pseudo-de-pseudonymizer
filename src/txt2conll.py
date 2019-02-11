@@ -42,8 +42,8 @@ NAMES_ARRAY = _load_names()
 
 
 def _load_communes_addresses():
-    df_communes = pd.read_csv("../../resources/addresses/all_communes_uniq.txt", header=None)
-    df_addresses = pd.read_csv("../../resources/addresses/all_addresses_uniq.txt", header=None)
+    df_communes = pd.read_csv("../resources/addresses/all_communes_uniq.txt", header=None)
+    df_addresses = pd.read_csv("../resources/addresses/all_addresses_uniq.txt", header=None)
 
     return df_communes[0].dropna().values, df_addresses[0].dropna().values
 

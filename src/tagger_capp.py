@@ -43,17 +43,17 @@ DATES = [DATE1]
 
 CLEANER1 = re.compile(r"(.)([A-Z]\.\.\.)(.)", flags=re.DOTALL)
 CLEANER2 = re.compile(r"(.)([xX]{3,})(.)", flags=re.DOTALL)
+CLEANER3 = re.compile(r"(née?\s*le\s*)([0-9]+\s*[\wÀ-Öû]+\s*[0-9]{4})", flags=re.MULTILINE|re.IGNORECASE)
 
 
-
-def text2clean(text):
+def text2cleanish(text):
     """
     Cleans text, tries to remove les coquilles,
     """
     logger.info("Cleaning text ...")
     text = CLEANER1.sub(r"\1 \2 \3", text)
     text = CLEANER2.sub(r"\1 ... \3", text)
-
+    text = CLEANER3.sub(r"\1 ... ", text)
     return text
 
 
@@ -63,9 +63,9 @@ def dots2tags(file_name, output_file=None):
 
     regexes = {"PER": NAMES, "DATE": DATES, "LOC": LOCS}
     modifs_sums = defaultdict(int)
-    with open(file_name, "r") as filo:
+    with open(file_name, "r") as filo   :
         all_text = filo.read()[:]
-        all_text = text2clean(all_text)
+        all_text = text2cleanish(all_text)
         logger.info("Starting the replacements ...")
 
         for k, v in regexes.items():

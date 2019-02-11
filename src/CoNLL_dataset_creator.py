@@ -7,9 +7,9 @@ Usage:
     CoNLL_dataset_creator.py FILE OUTPUT [-p PROPORTION]  [-n PCT] [-g TAGS] [-s]
 
 Arguments:
-    -g TAGS --tags=TAGS                 String representing the tags in the input dataset [default: PER,LOC,DATE,O]
+    -g TAGS --tags=TAGS                 String representing the tags in the input dataset [default: PER,LOC,DATE]
     -s --stratified                     Try to keep the same prportion of tags as the source
-    -p PROPORTION --proportion= PROPORTION   Override number of sequences for each tag. [default: LOC:3000,PER:1200,DATE:100,O:300000]
+    -p PROPORTION --proportion= PROPORTION   Override number of sequences for each tag. [default: LOC:3000,PER:1200,DATE:100]
 '''
 
 from docopt import docopt
@@ -39,17 +39,17 @@ if __name__ == '__main__':
 
     tags_freqs_src = {}
     sample_proportions = {}
-    tags_occurrences = defaultdict(int)
-
+    tags_occurrences = {}
     for tag in tags_used:
         logger.info("Getting the number of {} sequences on source file".format(tag))
-        if tag == "O":
-            cmd = "grep  -PRn  '\s{}' {} | wc -l".format(tag, conll_path)
-        else:
-            cmd = "grep  -PRn  'B-{}' {} | wc -l".format(tag, conll_path)
-
+        # if tag == "O":
+        #     cmd = "grep  -PRn  '\s{}' {} | wc -l".format(tag, conll_path)
+        # else:
+        cmd = "grep  -PRn  'B-{}' {} | wc -l".format(tag, conll_path)
         output = int(os.popen(cmd).read().strip())
+
         tags_freqs_src[tag] = output
+        tags_occurrences[tag] = 0
 
     desired_freqs = {k: min(int(v), tags_freqs_src[k]) for k, v in dict([f.split(":") for f in desired_freqs]).items()}
 
@@ -78,17 +78,16 @@ if __name__ == '__main__':
             if "-" in tag:
                 tag = tag.split("-")[1]
             token = splitted[0]
-            if tags_occurrences[tag] >= desired_freqs[tag]:
+            if tag != "O" and tags_occurrences[tag] >= desired_freqs[tag]:
                 continue
 
             keep_seq = True
-            if "B" in orig_tag or orig_tag[0] == "O":
+            if "B" in orig_tag:
                 tags_occurrences[tag] += 1
             if keep_seq:
                 output_file.write("{0} {1}\n".format(token, orig_tag))
 
             line_i += 1
-
 
             done = True
             for k, v in tags_occurrences.items():

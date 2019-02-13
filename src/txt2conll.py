@@ -72,7 +72,7 @@ def tokens2conll(tokens, iob_tag, begin=True):
 def per_repl(iob_tag="PER"):
     sampled_name = ""
     while sampled_name.strip() == "":
-        sampled_name = np.random.choice(NAMES_ARRAY)
+        sampled_name = np.random.choice(NAMES_ARRAY[0])
 
     sampled_name = NAMES_TOKENIZER.split(sampled_name)
     sampled_name[0] = "{0} B-{1}".format(sampled_name[0], iob_tag)

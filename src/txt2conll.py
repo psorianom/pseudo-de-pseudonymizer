@@ -31,11 +31,17 @@ moses_tokenizer = MosesTokenizer(lang="fr")
 MONTHS = ["janvier", "février", "mars", "avril", "mai", "june", "juillet",
           "août", "septembre", "octobre", "novembre", "décembre"]
 
-NAMES_TOKENIZER = re.compile(r"[\-\s]")
+NAMES_TOKENIZER = re.compile(r"(\@-\@)|\s")
 
-def _load_names():
-    df_names = pd.read_csv("../resources/names/names_last_names_FR.csv")
-    return df_names.prenom.dropna().values
+def _load_names(filter_n=10):
+    df_names = pd.read_csv("../resources/names/prenom.csv")
+    df_last_names = pd.read_csv("../resources/names/patronymes.csv")
+
+    # Filter top filter_n names
+    df_names = df_names[df_names["count"] >= filter_n]
+    df_last_names = df_last_names[df_last_names["count"] >= filter_n]
+
+    return df_names.prenom.dropna().values, df_last_names.patronyme.dropna().values
 
 
 NAMES_ARRAY = _load_names()
@@ -64,7 +70,10 @@ def tokens2conll(tokens, iob_tag, begin=True):
 
 
 def per_repl(iob_tag="PER"):
-    sampled_name = np.random.choice(NAMES_ARRAY)
+    sampled_name = ""
+    while sampled_name.strip() == "":
+        sampled_name = np.random.choice(NAMES_ARRAY)
+
     sampled_name = NAMES_TOKENIZER.split(sampled_name)
     sampled_name[0] = "{0} B-{1}".format(sampled_name[0], iob_tag)
     sampled_name[1:] = ["{0} I-{1}".format(f, iob_tag) for f in sampled_name[1:]]
@@ -73,11 +82,11 @@ def per_repl(iob_tag="PER"):
 
 
 def loc_repl(iob_tag="LOC"):
-    number = "{} B-{}".format(np.random.randint(1, 2000), iob_tag)
+    number = "{} B-{}".format(np.random.randint(1, 200), iob_tag)
     commune = tokens2conll(np.random.choice(COMUMNES_ARRAY), iob_tag, False)
     rue = tokens2conll(np.random.choice(ADDRESSES_ARRAY), iob_tag, False)
     cp = "{} I-{}".format("".join([str(np.random.randint(1, 9)) for _ in range(5)]), iob_tag)
-    return "\n".join([number, rue, commune, cp])
+    return "\n".join([number, rue, "\n", cp, commune.upper()])
 
 
 def date_repl(iob_tag="DATE"):
@@ -99,7 +108,7 @@ def txt2conll(file_path, output_path):
         logger.info("Segmenting and tokenizing text file ...")
         sentences_tokens = tokenize_text_para(pre_treated_lines)
 
-        logger.info("Writning output text file ...")
+        logger.info("Writing output text file ...")
 
         dict_tags = {"PERPERPER": per_repl, "LOCLOCLOC": loc_repl, "DATEDATEDATE": date_repl}
         with open(output_path, "w") as docu:

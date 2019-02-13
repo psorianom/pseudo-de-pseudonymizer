@@ -26,7 +26,7 @@ def dots_repl(matchobject):
 
 def dots2numberedDots(all_text, replace_string="..."):
     replace_string = re.escape(replace_string)
-    dots_regex = re.compile(r"(\s?)\[?({})\]?(\s*)".format(replace_string))
+    dots_regex = re.compile(r"(\s)[A-Z]?\[?({})\]?(\s)".format(replace_string))
     all_text = dots_regex.sub(dots_repl, all_text)
     return all_text
 

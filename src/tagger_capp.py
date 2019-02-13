@@ -17,16 +17,16 @@ LOC1 = re.compile(r"(\s?)\[?\.\.\.\]?\s*\n*\s*[à\-]?\s*[0-9]{5}(?:\s*[À-ÖA-Z\
                   flags=re.DOTALL | re.MULTILINE)  # ... à ANDREZIEUX-BOUTHEON
 
 
-LOC2 = re.compile(r"(demeurant\s*)\[?\.\.\.\]?")
-LOC3 = re.compile(r"(lieu\s*dit\s*)\[?\.\.\.\]?")
-LOC4 = re.compile(r"(\ssis\s*à?\s*)\[?\.\.\.\]?")
-LOC5 = re.compile(r"(située? [àa]u?\s*)\[?\.\.\.\]?\s")
-LOC6 = re.compile(r"(située?\s*)\[?\.\.\.\]?\s")
-LOC7 = re.compile(r"(domicilié [àa]u?\s*)\[?\.\.\.\]?\s")
-LOC10 = re.compile(r"(\ssiège\s*a?u?\s*)\[?\.\.\.\]?")
-LOC11 = re.compile(r"(demeurée?\s*)\[?\.\.\.\]?")
-LOC12 = re.compile(r"(à\s*)\[?\.\.\.\]?\s")
-LOC13 = re.compile(r"(domiciliée?\s*)\[?\.\.\.\]?")
+LOC2 = re.compile(r"(demeurant\s*)a?u?\s*\[?\.\.\.\]?", flags=re.IGNORECASE)
+LOC3 = re.compile(r"(lieu\s*dit\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
+LOC4 = re.compile(r"(\ssis\s*à?\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
+LOC5 = re.compile(r"(située? [àa]u?\s*)\[?\.\.\.\]?\s", flags=re.IGNORECASE)
+LOC6 = re.compile(r"(située?\s*)\[?\.\.\.\]?\s", flags=re.IGNORECASE)
+LOC7 = re.compile(r"(domicilié [àa]u?\s*)\[?\.\.\.\]?\s", flags=re.IGNORECASE)
+LOC10 = re.compile(r"(\ssiège\s*a?u?\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
+LOC11 = re.compile(r"(demeurée?\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
+LOC12 = re.compile(r"(à\s*)\[?\.\.\.\]?\s", flags=re.IGNORECASE)
+LOC13 = re.compile(r"(domiciliée?\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
 
 
 
@@ -44,7 +44,7 @@ DATES = [DATE1]
 CLEANER1 = re.compile(r"(.)([A-Z]\.\.\.)(.)", flags=re.DOTALL)
 CLEANER2 = re.compile(r"(.)([xX]{3,})(.)", flags=re.DOTALL)
 CLEANER3 = re.compile(r"(née?\s*le\s*)([0-9]+\s*[\wÀ-Öû]+\s*[0-9]{4})", flags=re.MULTILINE|re.IGNORECASE)
-
+CLEANER4 = re.compile(r"(.)([A-Z]{3,})(.)", flags=re.MULTILINE)
 
 def text2cleanish(text):
     """
@@ -54,6 +54,7 @@ def text2cleanish(text):
     text = CLEANER1.sub(r"\1 \2 \3", text)
     text = CLEANER2.sub(r"\1 ... \3", text)
     text = CLEANER3.sub(r"\1 ... ", text)
+    text = CLEANER4.sub(r"\1 X... \3", text)
     return text
 
 

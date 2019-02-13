@@ -38,7 +38,7 @@ def _load_names(filter_n=10):
     df_last_names = pd.read_csv("../resources/names/patronymes.csv")
 
     # Filter top filter_n names
-    df_names = df_names[df_names["count"] >= filter_n]
+    df_names = df_names[df_names["sum"] >= filter_n]
     df_last_names = df_last_names[df_last_names["count"] >= filter_n]
 
     return df_names.prenom.dropna().values, df_last_names.patronyme.dropna().values

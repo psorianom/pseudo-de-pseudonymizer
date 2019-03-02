@@ -7,14 +7,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # NAMES
-NAME1 = re.compile(r"([\w\W])[A-Z]\.\.\.")
+NAME1 = re.compile(r"([\n\r\s])(?:[A-Z])\1{0,}\.\.\.")
 
 NAMES = [NAME1]
 
 
 # ADDRESSES
-LOC1 = re.compile(r"(\s?)\[?\.\.\.\]?\s*\n*\s*[à\-]?\s*[0-9]{5}(?:\s*[À-ÖA-Z\'\-]{2,}\s*)+",
-                  flags=re.DOTALL | re.MULTILINE)  # ... à ANDREZIEUX-BOUTHEON
+LOC1 = re.compile(r"(\s?)\[?\.\.\.\]?[\s\n]*[à\-]?\s*[0-9]{5}(?:\s*[À-ÖA-Z\'\-]{2,}\s?)+(.)",
+                  flags=re.DOTALL)  # ... à ANDREZIEUX-BOUTHEON
 
 
 LOC2 = re.compile(r"(demeurant\s*)a?u?\s*\[?\.\.\.\]?", flags=re.IGNORECASE)
@@ -30,7 +30,7 @@ LOC13 = re.compile(r"(domiciliée?\s*)\[?\.\.\.\]?", flags=re.IGNORECASE)
 
 
 
-LOC8 = re.compile(r"([^A-Z])\.\.\.\.*\s*([0-9]{5}\s*[A-Z][^\.])", flags=re.DOTALL)  # ... 75007 Paris
+LOC8 = re.compile(r"([^A-Z])\.\.\.\.*\s*(\([0-9]{5}\)\s*[A-Z][^\.])", flags=re.DOTALL)  # ... 75007 Paris
 LOC9 = re.compile(r"([^A-Z])\[?\.\.\.\]?\s*[à\-]\s*[0-9A-Z]", flags=re.DOTALL)  # ... - PARIS
 
 
@@ -44,7 +44,7 @@ DATES = [DATE1]
 CLEANER1 = re.compile(r"(.)([A-Z]\.\.\.)(.)", flags=re.DOTALL)
 CLEANER2 = re.compile(r"(.)([xX]{3,})(.)", flags=re.DOTALL)
 CLEANER3 = re.compile(r"(née?\s*le\s*)([0-9]+\s*[\wÀ-Öû]+\s*[0-9]{4})", flags=re.MULTILINE|re.IGNORECASE)
-CLEANER4 = re.compile(r"(.)([A-Z]{3,})(.)", flags=re.MULTILINE)
+CLEANER4 = re.compile(r"(.)([A-Z])(.)", flags=re.MULTILINE)
 
 def text2cleanish(text):
     """
@@ -54,7 +54,7 @@ def text2cleanish(text):
     text = CLEANER1.sub(r"\1 \2 \3", text)
     text = CLEANER2.sub(r"\1 ... \3", text)
     text = CLEANER3.sub(r"\1 ... ", text)
-    text = CLEANER4.sub(r"\1 X... \3", text)
+    # text = CLEANER4.sub(r"\1 X... \3", text)
     return text
 
 

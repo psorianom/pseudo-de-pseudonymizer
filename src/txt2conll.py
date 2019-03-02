@@ -86,7 +86,7 @@ def loc_repl(iob_tag="LOC"):
     commune = tokens2conll(np.random.choice(COMUMNES_ARRAY), iob_tag, False)
     rue = tokens2conll(np.random.choice(ADDRESSES_ARRAY), iob_tag, False)
     cp = "{} I-{}".format("".join([str(np.random.randint(1, 9)) for _ in range(5)]), iob_tag)
-    return "\n".join([number, rue, "\n", cp, commune.upper()])
+    return "\n".join([number, rue, "\n", cp, commune.upper(), "\n"])
 
 
 def date_repl(iob_tag="DATE"):
@@ -103,7 +103,7 @@ def txt2conll(file_path, output_path):
         logger.info("Reading text file ...")
         raw_text = docu.read()
         logger.info("Pretreating text file ...")
-        pre_treated_lines, _ = pre_treat_text(raw_text)
+        pre_treated_lines, _ = pre_treat_text(raw_text[:])
         # segment sentences and tokens
         logger.info("Segmenting and tokenizing text file ...")
         sentences_tokens = tokenize_text_para(pre_treated_lines)

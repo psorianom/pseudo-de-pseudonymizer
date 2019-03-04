@@ -16,7 +16,7 @@ import re
 import numpy as np
 import pandas as pd
 from argopt import argopt
-from helpers import pre_treat_text, tokenize_text_para
+from helpers import pre_treat_text, tokenize_text_parallel
 from nltk.tokenize.regexp import RegexpTokenizer
 from sacremoses.tokenize import MosesTokenizer
 from tqdm import tqdm
@@ -31,7 +31,7 @@ moses_tokenizer = MosesTokenizer(lang="fr")
 MONTHS = ["janvier", "février", "mars", "avril", "mai", "june", "juillet",
           "août", "septembre", "octobre", "novembre", "décembre"]
 
-NAMES_TOKENIZER = re.compile(r"(\@-\@)|\s")
+NAMES_TOKENIZER = re.compile(r"(?:\@-\@)|\s")
 
 def _load_names(filter_n=10):
     df_names = pd.read_csv("../resources/names/prenom.csv")
@@ -58,7 +58,7 @@ COMUMNES_ARRAY, ADDRESSES_ARRAY = _load_communes_addresses()
 
 
 def tokens2conll(tokens, iob_tag, begin=True):
-    splitted = NAMES_TOKENIZER.split(tokens)
+    splitted = moses_tokenizer.tokenize(tokens, aggressive_dash_splits=True, escape=False)
     if begin:
         pos = "B"
     else:
@@ -74,7 +74,7 @@ def per_repl(iob_tag="PER"):
     while sampled_name.strip() == "":
         sampled_name = np.random.choice(NAMES_ARRAY[0])
 
-    sampled_name = NAMES_TOKENIZER.split(sampled_name)
+    sampled_name = moses_tokenizer.tokenize(sampled_name, aggressive_dash_splits=True, escape=False)
     sampled_name[0] = "{0} B-{1}".format(sampled_name[0], iob_tag)
     sampled_name[1:] = ["{0} I-{1}".format(f, iob_tag) for f in sampled_name[1:]]
     sampled_name = "\n".join(sampled_name)
@@ -106,7 +106,7 @@ def txt2conll(file_path, output_path):
         pre_treated_lines, _ = pre_treat_text(raw_text[:])
         # segment sentences and tokens
         logger.info("Segmenting and tokenizing text file ...")
-        sentences_tokens = tokenize_text_para(pre_treated_lines)
+        sentences_tokens = tokenize_text_parallel(pre_treated_lines)
 
         logger.info("Writing output text file ...")
 

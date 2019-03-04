@@ -40,8 +40,12 @@ def post_treat_text(text):
     return post_treated_text
 
 
-def tokenize_text_para(text_lines):
-    sentences_tokens = Parallel(n_jobs=N_CORES, prefer="processes")(delayed(tokenize_line)(line) for line in tqdm(text_lines))
+def tokenize_text_parallel(text_lines, n_jobs=None):
+    if n_jobs:
+        n_jobs = n_jobs
+    else:
+        n_jobs = N_CORES
+    sentences_tokens = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(tokenize_line)(line) for line in tqdm(text_lines))
     sentences_tokens = list(itertools.chain(*sentences_tokens))
     return sentences_tokens
 

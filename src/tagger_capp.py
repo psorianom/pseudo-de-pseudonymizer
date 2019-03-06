@@ -101,3 +101,4 @@ if __name__ == '__main__':
     output_file = sys.argv[2]
 
     tagged_text = dots2tags(input_file, output_file)
+

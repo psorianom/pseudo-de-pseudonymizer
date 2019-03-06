@@ -1,11 +1,10 @@
 '''Transforms raw text into files format CoNLL (one token per line)
 
 Usage:
-    txt2conll.py <i> <o>
+    txt2conll.py <i> [options]
 
 Arguments:
     <i>                   An input file or directory (if dir it will convert all txt files inside).
-    <o>                   An output directory.
 '''
 import glob
 import logging
@@ -20,6 +19,7 @@ from helpers import pre_treat_text, tokenize_text_parallel
 from nltk.tokenize.regexp import RegexpTokenizer
 from sacremoses.tokenize import MosesTokenizer
 from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -32,6 +32,7 @@ MONTHS = ["janvier", "février", "mars", "avril", "mai", "june", "juillet",
           "août", "septembre", "octobre", "novembre", "décembre"]
 
 NAMES_TOKENIZER = re.compile(r"(?:\@-\@)|\s")
+
 
 def _load_names(filter_n=10):
     df_names = pd.read_csv("../resources/names/prenom.csv")
@@ -50,15 +51,18 @@ NAMES_ARRAY = _load_names()
 def _load_communes_addresses():
     df_communes = pd.read_csv("../resources/addresses/all_communes_uniq.txt", header=None)
     df_addresses = pd.read_csv("../resources/addresses/all_addresses_uniq.txt", header=None)
-
-    return df_communes[0].dropna().values, df_addresses[0].dropna().values
-
-
-COMUMNES_ARRAY, ADDRESSES_ARRAY = _load_communes_addresses()
+    df_cp = pd.read_csv("../resources/addresses/all_cp_uniq.txt", header=None)
+    return df_communes[0].dropna().values, df_addresses[0].dropna().values, df_cp[0].dropna().values
 
 
-def tokens2conll(tokens, iob_tag, begin=True):
+COMUMNES_ARRAY, ADDRESSES_ARRAY, CP_ARRAY = _load_communes_addresses()
+
+
+def tokens2conll(tokens, iob_tag, begin=True, capitalize=False):
     splitted = moses_tokenizer.tokenize(tokens, aggressive_dash_splits=True, escape=False)
+    if capitalize:
+        splitted = [s.capitalize() for s in splitted]
+
     if begin:
         pos = "B"
     else:
@@ -69,11 +73,29 @@ def tokens2conll(tokens, iob_tag, begin=True):
     return final_token
 
 
-def per_repl(iob_tag="PER"):
-    sampled_name = ""
-    while sampled_name.strip() == "":
-        sampled_name = np.random.choice(NAMES_ARRAY[0])
+def per_repl(iob_tag="PER", num_names=(0, 1)):
+    """
+    Get a random name to represent the tag PER
+    :param iob_tag: Tag to identify this entity. Default: PER
+    :param num_names: Tuple with (number_names, number_last_names)
+    :return:
+    """
 
+    def capitalize(name, cap_prob=0.7):
+        if random.random() <= cap_prob:
+            return name.capitalize()
+        else:
+            return name
+
+    sampled_fname = []
+    for fn in range(num_names[0]):
+        sampled_fname.append(np.random.choice(NAMES_ARRAY[0]).strip().capitalize())
+    sampled_lname = []
+    for fn in range(num_names[1]):
+        last_name = capitalize(np.random.choice(NAMES_ARRAY[1]).strip(), 0.2)
+        sampled_lname.append(last_name)
+
+    sampled_name = " ".join(sampled_fname + sampled_lname)
     sampled_name = moses_tokenizer.tokenize(sampled_name, aggressive_dash_splits=True, escape=False)
     sampled_name[0] = "{0} B-{1}".format(sampled_name[0], iob_tag)
     sampled_name[1:] = ["{0} I-{1}".format(f, iob_tag) for f in sampled_name[1:]]
@@ -84,8 +106,8 @@ def per_repl(iob_tag="PER"):
 def loc_repl(iob_tag="LOC"):
     number = "{} B-{}".format(np.random.randint(1, 200), iob_tag)
     commune = tokens2conll(np.random.choice(COMUMNES_ARRAY), iob_tag, False)
-    rue = tokens2conll(np.random.choice(ADDRESSES_ARRAY), iob_tag, False)
-    cp = "{} I-{}".format("".join([str(np.random.randint(1, 9)) for _ in range(5)]), iob_tag)
+    rue = tokens2conll(np.random.choice(ADDRESSES_ARRAY), iob_tag, False, capitalize=True)
+    cp = "{} B-{}".format(np.random.choice(CP_ARRAY), iob_tag)
     return "\n".join([number, rue, "\n", cp, commune.upper(), "\n"])
 
 
@@ -106,6 +128,7 @@ def txt2conll(file_path, output_path):
         pre_treated_lines, _ = pre_treat_text(raw_text[:])
         # segment sentences and tokens
         logger.info("Segmenting and tokenizing text file ...")
+
         sentences_tokens = tokenize_text_parallel(pre_treated_lines)
 
         logger.info("Writing output text file ...")
@@ -129,8 +152,7 @@ def txt2conll(file_path, output_path):
 if __name__ == '__main__':
     parser = argopt(__doc__).parse_args()
     input_path = parser.i
-    output_path = parser.o
-    assert (os.path.isdir(output_path))
+    output_path = os.path.dirname(input_path)
 
     paths_input = []
     if os.path.isdir(input_path):
@@ -141,5 +163,5 @@ if __name__ == '__main__':
 
     for file_input in paths_input:
         logger.info("Converting to CoNLL format {}...".format(file_input))
-        output_file = os.path.join(output_path, os.path.basename(file_input[:-4] + "_CoNLL.txt"))
+        output_file = file_input[:-4] + "_CoNLL.txt"
         txt2conll(file_input, output_file)

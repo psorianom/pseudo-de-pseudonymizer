@@ -1,7 +1,7 @@
 '''Transforms XML files into format CoNLL (one token per line)
 
 Usage:
-    txt2conll.py <i> <o> [options]
+    xml2txt.py <i> <o> [options]
 
 Arguments:
     <i>                   An input file or directory (if dir it will convert all txt files inside).

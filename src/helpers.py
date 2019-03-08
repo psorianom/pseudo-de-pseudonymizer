@@ -4,7 +4,7 @@ import re
 import os
 from sentence_splitter import split_text_into_sentences
 from joblib import Parallel, delayed
-from sacremoses.tokenize import MosesTokenizer, MosesDetokenizer
+from sacremoses.tokenize import MosesTokenizer
 from tqdm import tqdm
 
 
@@ -16,7 +16,6 @@ logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 
 def pre_treat_text(raw_text):
-    # TODO: We should really use the same tokenizer used to generate the train.iob file (moses) as doctrine did
     # pre_treat_text = re.sub(r"(\w{2,})-(\w+)", r"\1@-@\2", raw_text, flags=re.IGNORECASE)  # Add @ to dashes
     pre_treated_text = re.sub(r"\n{2,}", r"\n", raw_text)  # Replace two or more lines by a single line
     pre_treated_text = re.sub(r"\xa0", r" ", pre_treated_text)  # Replace this new line symbol by a space

@@ -125,7 +125,7 @@ def txt2conll(file_path, output_path):
         logger.info("Reading text file ...")
         raw_text = docu.read()
         logger.info("Pretreating text file ...")
-        pre_treated_lines, _ = pre_treat_text(raw_text[:])
+        pre_treated_lines, _ = pre_treat_text(raw_text)
         # segment sentences and tokens
         logger.info("Segmenting and tokenizing text file ...")
 

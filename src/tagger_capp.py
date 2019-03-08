@@ -7,9 +7,9 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # NAMES
-NAME1 = re.compile(r"([\n\r\s])(?:[A-Z])\1{0,}\.\.\.")
+PER1 = re.compile(r"([\n\r\s])(?:[A-Z])\1{0,}\.\.\.")
 
-NAMES = [NAME1]
+PERS = [PER1]
 
 
 # ADDRESSES
@@ -62,7 +62,7 @@ def dots2tags(file_name, output_file=None):
     if not output_file:
         output_file = file_name[-4:] + "tagged.txt"
 
-    regexes = {"PER": NAMES, "DATE": DATES, "LOC": LOCS}
+    regexes = {"PER": PERS, "DATE": DATES, "LOC": LOCS}
     modifs_sums = defaultdict(int)
     with open(file_name, "r") as filo   :
         all_text = filo.read()[:]

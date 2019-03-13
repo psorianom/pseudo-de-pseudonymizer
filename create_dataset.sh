@@ -2,7 +2,7 @@
 
 conda activate pseudo-de-pseudonymizer
 
-python src/xml2txt.py data/capp_legifrance/xml/*.xml data/capp_legifrance/dataset
+python src/xml2txt.py "data/capp_legifrance/xml/*.xml" data/capp_legifrance/dataset --num 18
 
 # Replace pseudonyms by LOC, PER, DATE tags in train, dev, test
 

@@ -35,8 +35,8 @@ NAMES_TOKENIZER = re.compile(r"(?:\@-\@)|\s")
 
 
 def _load_names(filter_n=10):
-    df_names = pd.read_csv("../resources/names/prenom.csv")
-    df_last_names = pd.read_csv("../resources/names/patronymes.csv")
+    df_names = pd.read_csv("resources/names/prenom.csv")
+    df_last_names = pd.read_csv("resources/names/patronymes.csv")
 
     # Filter top filter_n names
     df_names = df_names[df_names["sum"] >= filter_n]
@@ -49,9 +49,9 @@ NAMES_ARRAY = _load_names()
 
 
 def _load_communes_addresses():
-    df_communes = pd.read_csv("../resources/addresses/all_communes_uniq.txt", header=None)
-    df_addresses = pd.read_csv("../resources/addresses/all_addresses_uniq.txt", header=None)
-    df_cp = pd.read_csv("../resources/addresses/all_cp_uniq.txt", header=None)
+    df_communes = pd.read_csv("resources/addresses/all_communes_uniq.txt", header=None)
+    df_addresses = pd.read_csv("resources/addresses/all_addresses_uniq.txt", header=None)
+    df_cp = pd.read_csv("resources/addresses/all_cp_uniq.txt", header=None)
     return df_communes[0].dropna().values, df_addresses[0].dropna().values, df_cp[0].dropna().values
 
 

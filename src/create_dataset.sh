@@ -1,8 +1,8 @@
 #!/usr/bin/env zsh
 
-conda activate pseudo-de-pseudonymizer
+#conda activate pseudo-de-pseudonymizer
 
-python xml2txt.py /data/capp_legifrance/extracto/*.xml /data/capp_legifrance/dataset
+python xml2txt.py "/data/capp_legifrance/extracto/*.xml" /data/capp_legifrance/dataset --num 840
 
 # Replace pseudonyms by LOC, PER, DATE tags in train, dev, test
 

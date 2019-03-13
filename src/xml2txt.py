@@ -6,7 +6,7 @@ Usage:
 Arguments:
     <i>                   An input file or directory (if dir it will convert all txt files inside).
     <o>                   An output directory.
-    --num=<n> NUM                  Number of decisions [default: 200]
+    --num=<n> NUM                  Number of decisions [default: 1000]
     -r RATIO                   Ratio train/dev/test [default: 60/20/20]
 '''
 import os
@@ -47,7 +47,7 @@ def xml2txt(files_to_treat, label, output_path):
     output_file = os.path.join(output_path, label + ".txt")
     with open(output_file, "w") as filo:
         for i,f in enumerate(files_to_treat):
-            print("Treating file {0} => {1}/{2}\n".format(f, i+1 , n_files))
+            logger.info("Treating file {0} => {1}/{2}\n".format(f, i+1 , n_files))
             e = xml.etree.ElementTree.parse(f).getroot()
 
             try:
@@ -56,7 +56,7 @@ def xml2txt(files_to_treat, label, output_path):
                 filo.write("".join(space_text) + "\n")
 
             except Exception as e:
-                print("Could not parse file {}\n because {}".format(f, e))
+                logger.error("Could not parse file {}\n because {}".format(f, e))
 
 
 if __name__ == '__main__':

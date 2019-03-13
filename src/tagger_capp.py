@@ -13,7 +13,7 @@ PERS = [PER1]
 
 
 # ADDRESSES
-LOC1 = re.compile(r"(\s?)\[?\.\.\.\]?[\s\n]*[à\-]?\s*[0-9]{5}(?:\s*[À-ÖA-Z\'\-]{2,}\s?)+(.)",
+LOC1 = re.compile(r"(\s?)\[?\.\.\.\]?[\s\n]*[à\-]?\s*([0-9]{5}\s*[À-ÖA-Z\'\-]{2,}\s?)+",
                   flags=re.DOTALL)  # ... à ANDREZIEUX-BOUTHEON
 
 
@@ -53,7 +53,7 @@ def text2cleanish(text):
     logger.info("Cleaning text ...")
     text = CLEANER1.sub(r"\1 \2 \3", text)
     text = CLEANER2.sub(r"\1 ... \3", text)
-    text = CLEANER3.sub(r"\1 ... ", text)
+    # text = CLEANER3.sub(r"\1 ... ", text)
     # text = CLEANER4.sub(r"\1 X... \3", text)
     return text
 

@@ -67,9 +67,16 @@ def tokens2conll(tokens, iob_tag, begin=True, capitalize=False):
         pos = "B"
     else:
         pos = "I"
-    splitted[0] = "{0} {1}-{2}".format(splitted[0], pos, iob_tag)
-    splitted[1:] = ["{0} I-{1}".format(f, iob_tag) for f in splitted[1:]]
-    final_token = "\n".join(splitted)
+
+    if iob_tag != "O":
+        splitted[0] = "{0} {1}-{2}".format(splitted[0], pos, iob_tag)
+        splitted[1:] = ["{0} I-{1}".format(f, iob_tag) for f in splitted[1:]]
+        final_token = "\n".join(splitted)
+    else:
+        splitted[0] = "{0} {1}".format(splitted[0], iob_tag)
+        splitted[1:] = ["{0} {1}".format(f, iob_tag) for f in splitted[1:]]
+        final_token = "\n".join(splitted)
+
     return final_token
 
 
@@ -92,11 +99,12 @@ def per_repl(iob_tag="PER", num_names=(0, 1)):
         sampled_fname.append(np.random.choice(NAMES_ARRAY[0]).strip().capitalize())
     sampled_lname = []
     for fn in range(num_names[1]):
-        last_name = capitalize(np.random.choice(NAMES_ARRAY[1]).strip(), 0.2)
+        last_name = np.random.choice(NAMES_ARRAY[1]).strip()
         sampled_lname.append(last_name)
 
     sampled_name = " ".join(sampled_fname + sampled_lname)
     sampled_name = moses_tokenizer.tokenize(sampled_name, aggressive_dash_splits=True, escape=False)
+    sampled_name = [capitalize(w, 0.2) for w in sampled_name]
     sampled_name[0] = "{0} B-{1}".format(sampled_name[0], iob_tag)
     sampled_name[1:] = ["{0} I-{1}".format(f, iob_tag) for f in sampled_name[1:]]
     sampled_name = "\n".join(sampled_name)
@@ -105,10 +113,10 @@ def per_repl(iob_tag="PER", num_names=(0, 1)):
 
 def loc_repl(iob_tag="LOC"):
     number = "{} B-{}".format(np.random.randint(1, 200), iob_tag)
-    commune = tokens2conll(np.random.choice(COMUMNES_ARRAY), iob_tag, False)
+    commune = tokens2conll(np.random.choice(COMUMNES_ARRAY), "O", False)
     rue = tokens2conll(np.random.choice(ADDRESSES_ARRAY), iob_tag, False, capitalize=True)
-    cp = "{} B-{}".format(np.random.choice(CP_ARRAY), iob_tag)
-    return "\n".join([number, rue, "\n", cp, commune.upper(), "\n"])
+    cp = "{} O".format(np.random.choice(CP_ARRAY))
+    return "\n".join([number, rue, "\n"])
 
 
 def date_repl(iob_tag="DATE"):
